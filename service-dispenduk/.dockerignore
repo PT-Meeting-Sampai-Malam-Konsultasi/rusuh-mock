@@ -1,0 +1,13 @@
+node_modules/
+coverage/
+.git/
+.gitignore
+.env*
+!.env.example
+.husky/
+docs/
+postman/
+deploy/
+**/__tests__/
+*.log
+.DS_Store

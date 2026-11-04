@@ -1,0 +1,23 @@
+$kind: http-request
+name: 'POST /api/v1/sample-resources'
+method: POST
+url: '{{base_url}}/api/v1/sample-resources'
+order: 4000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "Example resource",
+      "description": "Non-durable boilerplate sample"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('returns 201', () => pm.response.to.have.status(201));
+      pm.test('returns a resource identifier', () => pm.expect(pm.response.json().data.id).to.be.a('string'));
+      pm.collectionVariables.set('sample_resource_id', pm.response.json().data.id);
+examples: './.resources/create-sample-resource.resources/examples'

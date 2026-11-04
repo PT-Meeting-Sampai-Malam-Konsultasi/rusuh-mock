@@ -1,0 +1,15 @@
+$kind: http-request
+name: 'GET /api/v1/sample-resources/:id'
+method: GET
+url: '{{base_url}}/api/v1/sample-resources/:id'
+order: 5000
+pathVariables:
+  - key: id
+    value: '{{sample_resource_id}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('returns 200', () => pm.response.to.have.status(200));
+      pm.test('returns the created resource', () => pm.expect(pm.response.json().data.id).to.eql(pm.collectionVariables.get('sample_resource_id')));
+examples: './.resources/get-sample-resource.resources/examples'

@@ -1,0 +1,177 @@
+openapi: 3.0.3
+info:
+  title: Node.js Service Boilerplate API
+  version: 1.0.0
+  description: Operational and example endpoints supplied by the service boilerplate.
+servers:
+  - url: http://localhost:8080
+paths:
+  /sys/ping:
+    get:
+      summary: Returns the legacy-compatible operational ping response.
+      responses:
+        '200':
+          description: Plain-text ok response.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ok
+  /health/live:
+    get:
+      summary: Checks whether the service process can respond.
+      responses:
+        '200':
+          $ref: '#/components/responses/OperationalStatus'
+  /health/ready:
+    get:
+      summary: Checks whether the service is ready to accept traffic.
+      responses:
+        '200':
+          $ref: '#/components/responses/ReadyStatus'
+        '503':
+          $ref: '#/components/responses/NotReadyStatus'
+  /api/v1/sample-resources:
+    get:
+      summary: Lists non-durable sample resources.
+      responses:
+        '200':
+          description: Sample resources.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SampleResource'
+    post:
+      summary: Creates a non-durable sample resource.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSampleResourceRequest'
+      responses:
+        '201':
+          description: Created sample resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SampleResourceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /api/v1/sample-resources/{id}:
+    get:
+      summary: Retrieves a sample resource by UUID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Sample resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SampleResourceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    CreateSampleResourceRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+          default: ''
+    SampleResource:
+      type: object
+      required: [id, name, description, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    SampleResourceResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/SampleResource'
+    ErrorResponse:
+      type: object
+      required: [statusCode, error, message]
+      properties:
+        statusCode:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+  responses:
+    OperationalStatus:
+      description: Service liveness status.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status]
+            properties:
+              status:
+                type: string
+                enum: [ok]
+    ReadyStatus:
+      description: Service readiness status.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status]
+            properties:
+              status:
+                type: string
+                enum: [ready]
+    NotReadyStatus:
+      description: Service initialization has not completed.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status]
+            properties:
+              status:
+                type: string
+                enum: [not_ready]
+    BadRequest:
+      description: Request validation or JSON parsing failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
