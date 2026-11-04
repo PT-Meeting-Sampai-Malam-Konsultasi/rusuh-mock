@@ -1,4 +1,4 @@
-# service-dispenduk
+# service-dukcapil
 
 Dukcapil NIK verification mock for rusuh — a stand-in third-party service with synthetic data. Not a production verification path (see D22 in the repo README).
 
@@ -26,7 +26,7 @@ Response `200` (unknown NIKs and name mismatches are results, not errors):
 - `valid: false, reason: "NIK_NOT_FOUND"` — NIK not in the dataset.
 - `400` — malformed request (NIK not 16 digits, missing name, malformed JSON, duplicate JSON keys when enabled).
 
-OpenAPI: `docs/openapi.yaml`. Postman: `postman/collections/service-dispenduk/`.
+OpenAPI: `docs/openapi.yaml`. Postman: `postman/collections/service-dukcapil/`.
 
 ## Synthetic dataset
 

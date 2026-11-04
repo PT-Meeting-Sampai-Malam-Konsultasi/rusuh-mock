@@ -41,7 +41,7 @@
     ]
   },
   "main": "src/server.js",
-  "name": "service-dispenduk",
+  "name": "service-dukcapil",
   "private": true,
   "repository": {
     "type": "git",
@@ -54,7 +54,7 @@
     "format:write": "prettier --write .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "postman:run": "postman collection run postman/collections/service-dispenduk -e postman/environments/local.yaml",
+    "postman:run": "postman collection run postman/collections/service-dukcapil -e postman/environments/local.yaml",
     "prepare": "husky",
     "start": "node src/server.js",
     "test": "jest --runInBand",

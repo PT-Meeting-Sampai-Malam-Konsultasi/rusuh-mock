@@ -3,7 +3,7 @@
 The Dockerfile uses a multi-stage build with public npm dependencies only (no registry secrets needed):
 
 ```sh
-docker build -t service-dispenduk:local .
+docker build -t service-dukcapil:local .
 ```
 
 The image is non-root and probes `/health/live` and `/health/ready`. Do not use `exec` probes that require shell utilities in the distroless runtime image.

@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: service-dispenduk API
+  title: service-dukcapil API
   version: 1.0.0
   description: 'Dukcapil NIK verification mock for rusuh. Proposed contract (see the service README): deterministic, synthetic data only, not a production verification path.'
 servers:
