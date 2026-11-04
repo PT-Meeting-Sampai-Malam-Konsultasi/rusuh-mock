@@ -15,5 +15,5 @@ response:
       {
         "statusCode": 400,
         "error": "Bad Request",
-        "message": "\"nik\" must be a 16-digit number"
+        "message": "\"nik\" must be a valid Indonesian NIK (16 digits with a valid birth date component)"
       }

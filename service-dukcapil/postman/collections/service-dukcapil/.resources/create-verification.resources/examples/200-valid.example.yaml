@@ -14,9 +14,8 @@ response:
     content: |-
       {
         "data": {
-          "nik": "9901010101900001",
+          "nik": "3171010101900001",
           "valid": true,
-          "name": "Budi Santoso",
           "reason": null
         }
       }

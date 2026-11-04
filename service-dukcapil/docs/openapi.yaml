@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: service-dukcapil API
   version: 1.0.0
-  description: 'Dukcapil NIK verification mock for rusuh. Proposed contract (see the service README): deterministic, synthetic data only, not a production verification path.'
+  description: 'Dukcapil NIK verification mock for rusuh. Proposed contract (see the service README): NIK-only verification against a synthetic dataset, real Indonesian NIK format, deterministic, not a production verification path.'
 servers:
   - url: http://localhost:8080
 # All endpoints are intentionally unauthenticated: this is a local mock.
@@ -39,7 +39,7 @@ paths:
   /api/v1/verifications:
     post:
       operationId: verifyNik
-      summary: Verifies a NIK against a name from the synthetic dataset.
+      summary: Verifies a NIK against the synthetic dataset.
       requestBody:
         required: true
         content:
@@ -48,7 +48,7 @@ paths:
               $ref: '#/components/schemas/VerifyRequest'
       responses:
         '200':
-          description: Verification result (unknown NIKs and name mismatches are valid:false results, not errors).
+          description: Verification result (unknown NIKs are valid:false results, not errors).
           content:
             application/json:
               schema:
@@ -59,33 +59,23 @@ components:
   schemas:
     VerifyRequest:
       type: object
-      required: [nik, name]
+      required: [nik]
       properties:
         nik:
           type: string
-          pattern: '^\d{16}$'
-          description: 16-digit NIK to verify.
-        name:
-          type: string
-          minLength: 1
-          maxLength: 100
-          description: Name to match against the dataset (case-insensitive, trimmed).
+          description: NIK to verify, in the real Indonesian format (16 digits with a valid birth date component).
     VerificationResult:
       type: object
-      required: [nik, valid, name, reason]
+      required: [nik, valid, reason]
       properties:
         nik:
           type: string
         valid:
           type: boolean
-        name:
-          type: string
-          nullable: true
-          description: Matched dataset name when valid, null otherwise.
         reason:
           type: string
           nullable: true
-          enum: [NIK_NOT_FOUND, NAME_MISMATCH]
+          enum: [NIK_NOT_FOUND]
           description: Null when valid.
     VerificationResponse:
       type: object

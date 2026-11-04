@@ -1,5 +1,5 @@
 $kind: http-example
-name: 200 Name mismatch
+name: 200 Not found
 request:
   method: POST
   url: 'http://localhost:8080/api/v1/verifications'
@@ -14,9 +14,8 @@ response:
     content: |-
       {
         "data": {
-          "nik": "9901010101900001",
+          "nik": "3171010101900099",
           "valid": false,
-          "name": null,
-          "reason": "NAME_MISMATCH"
+          "reason": "NIK_NOT_FOUND"
         }
       }

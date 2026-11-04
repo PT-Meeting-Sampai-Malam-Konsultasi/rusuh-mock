@@ -44,5 +44,6 @@ service-dukcapil/   # NIK verification mock (Node.js, from the boilerplate templ
 
 - 4 Nov 2026: repo created, README initiated. Template received
   (Node.js service boilerplate); `service-dukcapil` scaffolded on
-  feature branch `feature/service-dukcapil` (pending review; its
-  verification contract is a proposal, Q36 still open).
+  feature branch `feature/service-dukcapil` (pending review; contract
+  revised 5 Nov: NIK-only, real Indonesian format; registration collects
+  no NIK; purchase-time gating still open).

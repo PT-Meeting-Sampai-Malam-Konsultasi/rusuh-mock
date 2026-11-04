@@ -29,48 +29,44 @@ describe('application factory', () => {
     await expect(request(app).get('/health/ready')).resolves.toMatchObject({ status: 200, body: { status: 'ready' } });
   });
 
-  test('verifies a known NIK and name', async () => {
+  test('verifies a known NIK', async () => {
     const app = createApp({ config, platform });
-    const response = await request(app)
-      .post('/api/v1/verifications')
-      .send({ nik: '9901010101900001', name: 'Budi Santoso' });
+    const response = await request(app).post('/api/v1/verifications').send({ nik: '3171010101900001' });
 
     expect(response.status).toBe(200);
-    expect(response.body.data).toEqual({
-      nik: '9901010101900001',
-      valid: true,
-      name: 'Budi Santoso',
-      reason: null
-    });
+    expect(response.body.data).toEqual({ nik: '3171010101900001', valid: true, reason: null });
   });
 
-  test('reports name mismatch and unknown NIK as valid:false, not errors', async () => {
+  test('reports an unknown NIK as valid:false, not an error', async () => {
     const app = createApp({ config, platform });
 
-    await expect(
-      request(app).post('/api/v1/verifications').send({ nik: '9901010101900001', name: 'Siti Rahma' })
-    ).resolves.toMatchObject({
-      status: 200,
-      body: { data: { valid: false, reason: 'NAME_MISMATCH' } }
-    });
-
-    await expect(
-      request(app).post('/api/v1/verifications').send({ nik: '9901010101900099', name: 'Nobody Here' })
-    ).resolves.toMatchObject({
+    await expect(request(app).post('/api/v1/verifications').send({ nik: '3171010101900099' })).resolves.toMatchObject({
       status: 200,
       body: { data: { valid: false, reason: 'NIK_NOT_FOUND' } }
     });
   });
 
+  test('rejects NIKs with an invalid real format', async () => {
+    const app = createApp({ config, platform });
+    const invalidNiks = [
+      '123',
+      '31710101019000AB',
+      '3171010113900001',
+      '3171013201900001',
+      '3171013002900001',
+      '3171010101900000'
+    ];
+
+    const responses = await Promise.all(
+      invalidNiks.map((nik) => request(app).post('/api/v1/verifications').send({ nik }))
+    );
+    responses.forEach((response) => expect(response.status).toBe(400));
+  });
+
   test('returns validation, malformed JSON, and not-found errors safely', async () => {
     const app = createApp({ config, platform });
 
-    await expect(request(app).post('/api/v1/verifications').send({ nik: '123', name: 'Budi' })).resolves.toMatchObject({
-      status: 400
-    });
-    await expect(request(app).post('/api/v1/verifications').send({ nik: '9901010101900001' })).resolves.toMatchObject({
-      status: 400
-    });
+    await expect(request(app).post('/api/v1/verifications').send({})).resolves.toMatchObject({ status: 400 });
     await expect(
       request(app).post('/api/v1/verifications').set('Content-Type', 'application/json').send('{')
     ).resolves.toMatchObject({
@@ -85,7 +81,7 @@ describe('application factory', () => {
     const response = await request(app)
       .post('/api/v1/verifications')
       .set('Content-Type', 'application/json')
-      .send('{"nik":"9901010101900001","nik":"9901010101900002","name":"Budi Santoso"}');
+      .send('{"nik":"3171010101900001","nik":"3171010101900002"}');
 
     expect(response.status).toBe(400);
     expect(response.body.message).toContain('Duplicate JSON key detected');
