@@ -9,6 +9,3 @@ test:
 
 run:
 	npm start
-
-kustomize-build:
-	npm run kustomize:build

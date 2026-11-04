@@ -1,0 +1,7 @@
+$kind: collection
+name: service-dispenduk
+version: 1.0.0
+variables:
+  - key: base_url
+    value: 'http://localhost:8080'
+    description: Local address of the running service-dispenduk service.

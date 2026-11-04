@@ -1,12 +1,13 @@
 # Architecture
 
-The boilerplate separates process lifecycle from application assembly:
+The service separates process lifecycle from application assembly:
 
 - `src/server.js` loads configuration, creates optional infrastructure, binds the HTTP port, and handles shutdown signals.
 - `src/app.js` exposes `createApp()`, allowing Supertest and consumers to create an Express app without binding a port.
-- `src/middleware/` owns cross-cutting concerns: duplicate JSON-key rejection, platform response/log handling, 404 handling, and terminal error handling.
+- `src/middleware/` owns cross-cutting concerns: duplicate JSON-key rejection, response/log handling, 404 handling, and terminal error handling.
 - `src/modules/` uses feature-local route, controller, service, validation, and constants files.
-- `src/infrastructure/` keeps outbound HTTP, cache, and config database adapters away from business modules.
+- `src/infrastructure/` keeps the optional in-memory cache adapter away from business modules.
+- `src/platform/` is a minimal local platform shim replacing the boilerplate's private `module-common-function` package (see the service README for why).
 
 ## Request flow
 

@@ -66,37 +66,29 @@ function detectDuplicateJsonKey(rawBody) {
   let position = 0;
 
   while (position < buffer.length) {
-    const code = buffer[position++];
+    const code = buffer[position];
+    position += 1;
 
     if (code === OPEN_BRACE) {
       scopes.push(new Set());
-      continue;
-    }
-
-    if (code === OPEN_BRACKET) {
+    } else if (code === OPEN_BRACKET) {
       scopes.push(null);
-      continue;
-    }
-
-    if (code === CLOSE_BRACE || code === CLOSE_BRACKET) {
+    } else if (code === CLOSE_BRACE || code === CLOSE_BRACKET) {
       scopes.pop();
-      continue;
+    } else if (code === QUOTE) {
+      const end = findStringEnd(buffer, position);
+      if (end === -1) return null;
+
+      const next = skipWhitespace(buffer, end + 1);
+      const scope = scopes[scopes.length - 1];
+      if (buffer[next] === COLON && scope instanceof Set) {
+        const key = buffer.toString('utf8', position, end);
+        if (scope.has(key)) return key;
+        scope.add(key);
+      }
+
+      position = end + 1;
     }
-
-    if (code !== QUOTE) continue;
-
-    const end = findStringEnd(buffer, position);
-    if (end === -1) return null;
-
-    const next = skipWhitespace(buffer, end + 1);
-    const scope = scopes[scopes.length - 1];
-    if (buffer[next] === COLON && scope instanceof Set) {
-      const key = buffer.toString('utf8', position, end);
-      if (scope.has(key)) return key;
-      scope.add(key);
-    }
-
-    position = end + 1;
   }
 
   return null;

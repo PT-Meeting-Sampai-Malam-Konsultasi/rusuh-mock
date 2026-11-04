@@ -1,21 +1,11 @@
 # Deployment
 
-The Dockerfile uses a multi-stage build. The dependency stage reads private npm configuration through a BuildKit secret, which keeps Artifactory credentials out of image layers:
+The Dockerfile uses a multi-stage build with public npm dependencies only (no registry secrets needed):
 
 ```sh
-docker build --secret id=npmrc,src=.npmrc -t {{SERVICE_NAME}}:local .
-```
-
-Kustomize files live under `deploy/kustomize/`:
-
-- `base/` provides generic Deployment, Service, HPA, and PDB resources.
-- `overlays/development/` provides a safe example overlay.
-
-Before deployment, replace every `{{...}}` placeholder with service-owned values, add secret references only through approved platform mechanisms, and render before applying:
-
-```sh
-kubectl kustomize deploy/kustomize/base
-kubectl kustomize deploy/kustomize/overlays/development
+docker build -t service-dispenduk:local .
 ```
 
 The image is non-root and probes `/health/live` and `/health/ready`. Do not use `exec` probes that require shell utilities in the distroless runtime image.
+
+In rusuh, the service is deployed via the `rusuh-infra` compute module (ECS + ALB); the image reference is supplied to that module at apply time. There are no Kustomize manifests and no GitLab CI in this repo (GitHub + ECS are the platforms).

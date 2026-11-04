@@ -1,32 +1,4 @@
 {
-  "name": "nodejs-service-boilerplate",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Production-ready Node.js service boilerplate for MyTelkomsel services.",
-  "main": "src/server.js",
-  "scripts": {
-    "start": "node src/server.js",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format:check": "prettier --check .",
-    "format:write": "prettier --write .",
-    "test": "jest --runInBand",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage --runInBand",
-    "api:lint": "redocly lint docs/openapi.yaml",
-    "postman:run": "postman collection run postman/collections/nodejs-service-boilerplate -e postman/environments/local.yaml",
-    "kustomize:build": "kubectl kustomize deploy/kustomize/base && kubectl kustomize deploy/kustomize/overlays/development",
-    "check": "npm run format:check && npm run lint && npm run test:coverage && npm run api:lint",
-    "prepare": "husky"
-  },
-  "repository": {
-    "type": "git",
-    "url": "REPLACE_WITH_SERVICE_REPOSITORY_URL"
-  },
-  "engines": {
-    "node": ">=20.16.0 <23",
-    "npm": ">=10"
-  },
   "_moduleAliases": {
     "@": "src"
   },
@@ -36,10 +8,9 @@
     "express": "^4.21.2",
     "joi": "^17.13.3",
     "lru-cache": "^10.4.3",
-    "module-alias": "^2.2.3",
-    "module-common-function": "https://jfrog.cicd.telkomsel.co.id/artifactory/npm-local/module-common-function/-/module-common-function-1.0.186.tgz",
-    "module-config-db": "https://jfrog.cicd.telkomsel.co.id/artifactory/npm-local/module-config-db/-/module-config-db-1.0.16.tgz"
+    "module-alias": "^2.2.3"
   },
+  "description": "Dukcapil NIK verification mock for rusuh (synthetic data, deterministic).",
   "devDependencies": {
     "@redocly/cli": "^1.25.10",
     "cross-env": "^7.0.3",
@@ -57,6 +28,10 @@
     "prettier": "^3.5.0",
     "supertest": "^7.0.0"
   },
+  "engines": {
+    "node": ">=20.16.0 <23",
+    "npm": ">=10"
+  },
   "lint-staged": {
     "*.{js,cjs,json,yaml,yml,md}": [
       "prettier --write"
@@ -64,5 +39,27 @@
     "*.{js,cjs}": [
       "eslint --fix"
     ]
-  }
+  },
+  "main": "src/server.js",
+  "name": "service-dispenduk",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PT-Meeting-Sampai-Malam-Konsultasi/rusuh-mock.git"
+  },
+  "scripts": {
+    "api:lint": "redocly lint docs/openapi.yaml",
+    "check": "npm run format:check && npm run lint && npm run test:coverage && npm run api:lint",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "postman:run": "postman collection run postman/collections/service-dispenduk -e postman/environments/local.yaml",
+    "prepare": "husky",
+    "start": "node src/server.js",
+    "test": "jest --runInBand",
+    "test:coverage": "jest --coverage --runInBand",
+    "test:watch": "jest --watch"
+  },
+  "version": "1.0.0"
 }

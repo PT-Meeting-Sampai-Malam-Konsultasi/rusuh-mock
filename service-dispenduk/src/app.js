@@ -1,7 +1,7 @@
 require('module-alias/register');
 
 const express = require('express');
-const CommonHelper = require('module-common-function');
+const defaultPlatform = require('@/platform/common');
 const { createDuplicateKeyVerifier } = require('@/middleware/duplicate-json-keys');
 const { createResponseMiddleware } = require('@/middleware/response');
 const { createErrorHandler } = require('@/middleware/error-handler');
@@ -14,17 +14,17 @@ const { mountRoutes } = require('@/routes');
  * @param {object} options - Application dependencies and runtime configuration.
  * @param {object} options.config - Validated service configuration.
  * @param {object} [options.platform] - Platform helper implementation.
- * @param {boolean} [options.usePlatformPreHandler] - Whether example routes use platform authentication.
+ * @param {boolean} [options.usePlatformPreHandler] - Whether routes use platform authentication.
  * @param {Function} [options.isReady] - Optional readiness predicate.
- * @param {Map<string, object>} [options.sampleResourceStore] - Optional sample resource backing store.
+ * @param {object[]} [options.verificationDataset] - Optional synthetic resident dataset for tests.
  * @returns {import('express').Express} Configured Express application.
  */
 function createApp({
   config,
-  platform = CommonHelper,
+  platform = defaultPlatform,
   usePlatformPreHandler = false,
   isReady,
-  sampleResourceStore
+  verificationDataset
 } = {}) {
   if (!config) throw new Error('createApp requires validated configuration');
 
@@ -39,7 +39,7 @@ function createApp({
   );
   app.use(express.urlencoded({ extended: true, limit: config.bodyLimit }));
 
-  mountRoutes(app, { platform, usePlatformPreHandler, isReady, sampleResourceStore });
+  mountRoutes(app, { platform, usePlatformPreHandler, isReady, verificationDataset });
   app.use(notFound);
   app.use(createErrorHandler({ platform }));
 

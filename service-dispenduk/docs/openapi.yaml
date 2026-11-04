@@ -1,13 +1,16 @@
 openapi: 3.0.3
 info:
-  title: Node.js Service Boilerplate API
+  title: service-dispenduk API
   version: 1.0.0
-  description: Operational and example endpoints supplied by the service boilerplate.
+  description: 'Dukcapil NIK verification mock for rusuh. Proposed contract (see the service README): deterministic, synthetic data only, not a production verification path.'
 servers:
   - url: http://localhost:8080
+# All endpoints are intentionally unauthenticated: this is a local mock.
+security: []
 paths:
   /sys/ping:
     get:
+      operationId: ping
       summary: Returns the legacy-compatible operational ping response.
       responses:
         '200':
@@ -19,106 +22,77 @@ paths:
                 example: ok
   /health/live:
     get:
+      operationId: getLive
       summary: Checks whether the service process can respond.
       responses:
         '200':
           $ref: '#/components/responses/OperationalStatus'
   /health/ready:
     get:
+      operationId: getReady
       summary: Checks whether the service is ready to accept traffic.
       responses:
         '200':
           $ref: '#/components/responses/ReadyStatus'
         '503':
           $ref: '#/components/responses/NotReadyStatus'
-  /api/v1/sample-resources:
-    get:
-      summary: Lists non-durable sample resources.
-      responses:
-        '200':
-          description: Sample resources.
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [data]
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/SampleResource'
+  /api/v1/verifications:
     post:
-      summary: Creates a non-durable sample resource.
+      operationId: verifyNik
+      summary: Verifies a NIK against a name from the synthetic dataset.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateSampleResourceRequest'
-      responses:
-        '201':
-          description: Created sample resource.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SampleResourceResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-  /api/v1/sample-resources/{id}:
-    get:
-      summary: Retrieves a sample resource by UUID.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-            format: uuid
+              $ref: '#/components/schemas/VerifyRequest'
       responses:
         '200':
-          description: Sample resource.
+          description: Verification result (unknown NIKs and name mismatches are valid:false results, not errors).
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SampleResourceResponse'
+                $ref: '#/components/schemas/VerificationResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
 components:
   schemas:
-    CreateSampleResourceRequest:
+    VerifyRequest:
       type: object
-      required: [name]
+      required: [nik, name]
       properties:
+        nik:
+          type: string
+          pattern: '^\d{16}$'
+          description: 16-digit NIK to verify.
         name:
           type: string
           minLength: 1
           maxLength: 100
-        description:
-          type: string
-          maxLength: 500
-          default: ''
-    SampleResource:
+          description: Name to match against the dataset (case-insensitive, trimmed).
+    VerificationResult:
       type: object
-      required: [id, name, description, createdAt]
+      required: [nik, valid, name, reason]
       properties:
-        id:
+        nik:
           type: string
-          format: uuid
+        valid:
+          type: boolean
         name:
           type: string
-        description:
+          nullable: true
+          description: Matched dataset name when valid, null otherwise.
+        reason:
           type: string
-        createdAt:
-          type: string
-          format: date-time
-    SampleResourceResponse:
+          nullable: true
+          enum: [NIK_NOT_FOUND, NAME_MISMATCH]
+          description: Null when valid.
+    VerificationResponse:
       type: object
       required: [data]
       properties:
         data:
-          $ref: '#/components/schemas/SampleResource'
+          $ref: '#/components/schemas/VerificationResult'
     ErrorResponse:
       type: object
       required: [statusCode, error, message]
@@ -165,12 +139,6 @@ components:
                 enum: [not_ready]
     BadRequest:
       description: Request validation or JSON parsing failed.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    NotFound:
-      description: The requested resource does not exist.
       content:
         application/json:
           schema:

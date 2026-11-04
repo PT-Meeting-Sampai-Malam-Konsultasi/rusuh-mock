@@ -1,5 +1,5 @@
 const Boom = require('@hapi/boom');
-const CommonHelper = require('module-common-function');
+const defaultPlatform = require('@/platform/common');
 
 /**
  * Creates the terminal Express error handler with safe client responses.
@@ -8,16 +8,18 @@ const CommonHelper = require('module-common-function');
  * @param {object} [options.platform] - Platform logging implementation.
  * @returns {Function} Express error middleware.
  */
-function createErrorHandler({ platform = CommonHelper } = {}) {
+function createErrorHandler({ platform = defaultPlatform } = {}) {
+  // eslint-disable-next-line no-unused-vars -- Express requires the 4th error-middleware argument.
   return (error, request, response, _next) => {
     if (response.headersSent) return;
 
     const isMalformedJson = error instanceof SyntaxError && Object.hasOwn(error, 'body');
-    const boomError = Boom.isBoom(error)
-      ? error
-      : isMalformedJson
-        ? Boom.badRequest('Malformed JSON request body')
-        : null;
+    let boomError = null;
+    if (Boom.isBoom(error)) {
+      boomError = error;
+    } else if (isMalformedJson) {
+      boomError = Boom.badRequest('Malformed JSON request body');
+    }
     const statusCode = boomError?.output?.statusCode || 500;
     const body = boomError?.output?.payload || {
       statusCode,

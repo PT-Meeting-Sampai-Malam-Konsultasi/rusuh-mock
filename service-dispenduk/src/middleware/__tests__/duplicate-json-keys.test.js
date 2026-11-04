@@ -14,7 +14,7 @@ describe('duplicate JSON key middleware', () => {
   });
 
   test('handles escaped key content', () => {
-    expect(detectDuplicateJsonKey('{"a\\\"b":"one","a\\\"b":"two"}')).toBe('a\\"b');
+    expect(detectDuplicateJsonKey('{"a\\"b":"one","a\\"b":"two"}')).toBe('a\\"b');
   });
 
   test('rejects a duplicate key only when enabled', () => {

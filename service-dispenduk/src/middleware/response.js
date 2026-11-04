@@ -1,4 +1,4 @@
-const CommonHelper = require('module-common-function');
+const defaultPlatform = require('@/platform/common');
 
 /**
  * Creates middleware that applies the platform response envelope and logs completion.
@@ -7,7 +7,7 @@ const CommonHelper = require('module-common-function');
  * @param {object} [options.platform] - Platform helper implementation.
  * @returns {Function} Express middleware.
  */
-function createResponseMiddleware({ platform = CommonHelper } = {}) {
+function createResponseMiddleware({ platform = defaultPlatform } = {}) {
   return (request, response, next) => {
     const originalSend = response.send.bind(response);
     let responseLogged = false;

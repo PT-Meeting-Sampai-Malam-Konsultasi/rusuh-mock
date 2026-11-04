@@ -1,0 +1,6 @@
+const VERIFICATION_REASONS = Object.freeze({
+  NIK_NOT_FOUND: 'NIK_NOT_FOUND',
+  NAME_MISMATCH: 'NAME_MISMATCH'
+});
+
+module.exports = { VERIFICATION_REASONS };

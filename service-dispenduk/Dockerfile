@@ -2,9 +2,8 @@
 FROM node:20.16.0-bookworm-slim AS dependencies
 WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
-RUN --mount=type=secret,id=npmrc,target=/root/.npmrc \
-    npm ci --omit=dev --ignore-scripts && \
-    node -e "for (const dependency of ['express', 'joi', '@hapi/boom', 'module-common-function', 'module-config-db']) require.resolve(dependency)"
+RUN npm ci --omit=dev --ignore-scripts && \
+    node -e "for (const dependency of ['express', 'joi', '@hapi/boom', 'lru-cache', 'dotenv', 'module-alias']) require.resolve(dependency)"
 
 FROM gcr.io/distroless/nodejs20-debian12:nonroot
 WORKDIR /usr/src/app

@@ -2,11 +2,10 @@ require('module-alias/register');
 require('dotenv').config();
 
 const http = require('http');
-const CommonHelper = require('module-common-function');
+const defaultPlatform = require('@/platform/common');
 const { loadEnvironment } = require('@/config/environment');
 const { createApp } = require('@/app');
 const { createMemoryCache } = require('@/infrastructure/cache/memory-cache');
-const { createConfigDbClient } = require('@/infrastructure/config-db/config-db.client');
 
 /**
  * Starts the HTTP server and registers controlled shutdown handlers.
@@ -16,12 +15,9 @@ const { createConfigDbClient } = require('@/infrastructure/config-db/config-db.c
 function startServer() {
   const config = loadEnvironment();
   const cache = config.cache.enabled ? createMemoryCache(config.cache) : undefined;
-  const configDb = createConfigDbClient({ enabled: config.configDb.enabled });
   const app = createApp({ config });
   const server = http.createServer(app);
   let shuttingDown = false;
-
-  configDb.start(config.configDb.refreshIntervalMs);
 
   /**
    * Stops accepting connections and exits after cleanup or the configured deadline.
@@ -33,9 +29,8 @@ function startServer() {
     if (shuttingDown) return;
     shuttingDown = true;
 
-    const logger = CommonHelper.LoggerBuilder?.getLogger?.();
+    const logger = defaultPlatform.LoggerBuilder?.getLogger?.();
     logger?.addTags?.(['server', 'shutdown'])?.addData?.({ signal })?.info?.('Graceful shutdown started');
-    configDb.stop();
     cache?.clear();
 
     const timeout = setTimeout(() => process.exit(1), config.gracefulShutdownTimeoutMs);
@@ -49,14 +44,14 @@ function startServer() {
   process.once('SIGTERM', () => shutdown('SIGTERM'));
   process.once('SIGINT', () => shutdown('SIGINT'));
   process.once('uncaughtException', (error) => {
-    CommonHelper.LoggerBuilder?.getLogger?.()
+    defaultPlatform.LoggerBuilder?.getLogger?.()
       .addTags?.(['server', 'uncaughtException'])
       ?.addData?.({ error: error.message })
       ?.error?.('Uncaught exception');
     shutdown('uncaughtException');
   });
   process.once('unhandledRejection', (error) => {
-    CommonHelper.LoggerBuilder?.getLogger?.()
+    defaultPlatform.LoggerBuilder?.getLogger?.()
       .addTags?.(['server', 'unhandledRejection'])
       ?.addData?.({ error: error?.message })
       ?.error?.('Unhandled rejection');
@@ -64,7 +59,7 @@ function startServer() {
   });
 
   server.listen(config.port, () => {
-    CommonHelper.LoggerBuilder?.getLogger?.()
+    defaultPlatform.LoggerBuilder?.getLogger?.()
       .addTags?.(['server', 'listen'])
       ?.addData?.({ port: config.port })
       ?.info?.('Server started');
