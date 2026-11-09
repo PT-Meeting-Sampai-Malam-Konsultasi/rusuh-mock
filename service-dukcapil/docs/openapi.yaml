@@ -1,0 +1,135 @@
+openapi: 3.0.3
+info:
+  title: service-dukcapil API
+  version: 1.0.0
+  description: 'Dukcapil NIK verification mock for rusuh. Proposed contract (see the service README): format-only NIK verification, real Indonesian NIK format, deterministic, not a production verification path.'
+servers:
+  - url: http://localhost:8080
+# All endpoints are intentionally unauthenticated: this is a local mock.
+security: []
+paths:
+  /sys/ping:
+    get:
+      operationId: ping
+      summary: Returns the legacy-compatible operational ping response.
+      responses:
+        '200':
+          description: Plain-text ok response.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: ok
+  /health/live:
+    get:
+      operationId: getLive
+      summary: Checks whether the service process can respond.
+      responses:
+        '200':
+          $ref: '#/components/responses/OperationalStatus'
+  /health/ready:
+    get:
+      operationId: getReady
+      summary: Checks whether the service is ready to accept traffic.
+      responses:
+        '200':
+          $ref: '#/components/responses/ReadyStatus'
+        '503':
+          $ref: '#/components/responses/NotReadyStatus'
+  /api/v1/verifications:
+    post:
+      operationId: verifyNik
+      summary: Verifies a NIK's format only (no dataset lookup).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRequest'
+      responses:
+        '200':
+          description: Verification result (format-invalid NIKs are valid:false results, not errors).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+components:
+  schemas:
+    VerifyRequest:
+      type: object
+      required: [nik]
+      properties:
+        nik:
+          type: string
+          description: 'NIK to verify, in the real Indonesian format (16 digits with a valid birth date component). Format-only: any NIK with a valid format verifies true.'
+    VerificationResult:
+      type: object
+      required: [nik, valid, reason]
+      properties:
+        nik:
+          type: string
+        valid:
+          type: boolean
+        reason:
+          type: string
+          nullable: true
+          enum: [NIK_INVALID_FORMAT]
+          description: Null when valid; otherwise NIK_INVALID_FORMAT, the single code for any format failure.
+    VerificationResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/VerificationResult'
+    ErrorResponse:
+      type: object
+      required: [statusCode, error, message]
+      properties:
+        statusCode:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+  responses:
+    OperationalStatus:
+      description: Service liveness status.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status]
+            properties:
+              status:
+                type: string
+                enum: [ok]
+    ReadyStatus:
+      description: Service readiness status.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status]
+            properties:
+              status:
+                type: string
+                enum: [ready]
+    NotReadyStatus:
+      description: Service is up but its readiness self-test failed.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status]
+            properties:
+              status:
+                type: string
+                enum: [not_ready]
+    BadRequest:
+      description: Request validation or JSON parsing failed.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

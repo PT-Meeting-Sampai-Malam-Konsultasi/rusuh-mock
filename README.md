@@ -6,7 +6,7 @@ the real service, deterministic, synthetic data, selected via config.
 
 ## Planned services (only 1 for now)
 
-- `service-dispenduk` — NIK verification (Dukcapil stand-in). This is
+- `service-dukcapil` — NIK verification (Dukcapil stand-in). This is
   the only service in this repo for now.
 
 ## Stack
@@ -34,14 +34,16 @@ Node.js. Implementation follows the provided Node.js project template
 - Feature work goes through a feature branch + review first (same as
   rusuh-infra).
 
-## Layout (planned)
+## Layout
 
 ```
-service-dispenduk/   # scaffolded from the Node.js template
+service-dukcapil/   # NIK verification mock (Node.js, from the boilerplate template)
 ```
 
 ## Status
 
 - 4 Nov 2026: repo created, README initiated. Template received
-  (Node.js service boilerplate); `service-dispenduk` is being
-  scaffolded on a feature branch.
+  (Node.js service boilerplate); `service-dukcapil` scaffolded on
+  feature branch `feature/service-dukcapil` (pending review; contract
+  revised 5 Nov: NIK-only, real Indonesian format; registration collects
+  no NIK; purchase-time gating still open).

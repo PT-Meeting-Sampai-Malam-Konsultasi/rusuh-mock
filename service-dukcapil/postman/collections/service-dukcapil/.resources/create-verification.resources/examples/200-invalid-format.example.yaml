@@ -1,0 +1,21 @@
+$kind: http-example
+name: 200 Invalid format
+request:
+  method: POST
+  url: 'http://localhost:8080/api/v1/verifications'
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    - key: Content-Type
+      value: application/json; charset=utf-8
+  body:
+    type: json
+    content: |-
+      {
+        "data": {
+          "nik": "3171010113900001",
+          "valid": false,
+          "reason": "NIK_INVALID_FORMAT"
+        }
+      }

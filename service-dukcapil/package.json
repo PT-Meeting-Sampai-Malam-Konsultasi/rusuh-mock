@@ -1,0 +1,67 @@
+{
+  "_moduleAliases": {
+    "@": "src"
+  },
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.3.0",
+    "joi": "^17.13.3",
+    "module-alias": "^2.2.3"
+  },
+  "description": "Dukcapil NIK verification mock for rusuh (synthetic data, deterministic).",
+  "devDependencies": {
+    "@redocly/cli": "^1.25.10",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jest": "^28.9.0",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "jest-sonar": "^0.2.16",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.5.0",
+    "supertest": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=20.16.0 <23",
+    "npm": ">=10"
+  },
+  "lint-staged": {
+    "*.{js,cjs,json,yaml,yml,md}": [
+      "prettier --write"
+    ],
+    "*.{js,cjs}": [
+      "eslint --fix"
+    ]
+  },
+  "main": "src/server.js",
+  "name": "service-dukcapil",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PT-Meeting-Sampai-Malam-Konsultasi/rusuh-mock.git"
+  },
+  "scripts": {
+    "api:lint": "redocly lint docs/openapi.yaml",
+    "check": "npm run format:check && npm run lint && npm run check:boundaries && npm run test:coverage && npm run api:lint",
+    "check:boundaries": "node ../scripts/check-boundaries.js .",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "postman:run": "postman collection run postman/collections/service-dukcapil -e postman/environments/local.yaml",
+    "prepare": "husky",
+    "start": "node src/server.js",
+    "test": "jest --runInBand",
+    "test:coverage": "jest --coverage --runInBand",
+    "test:watch": "jest --watch"
+  },
+  "version": "1.0.0"
+}
