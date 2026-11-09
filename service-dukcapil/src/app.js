@@ -1,7 +1,10 @@
 require('module-alias/register');
 
 const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
 const defaultPlatform = require('@/platform/common');
+const { parseCorsOrigins } = require('@/infrastructure/config/environment');
 const { createDuplicateKeyVerifier } = require('@/presentation/http/middleware/duplicate-json-keys');
 const { createResponseMiddleware } = require('@/presentation/http/middleware/response');
 const { createErrorHandler } = require('@/presentation/http/middleware/error-handler');
@@ -31,6 +34,8 @@ function createApp({
   const container = createContainer({ config, platform, usePlatformPreHandler, isReady, verificationDataset });
   const app = express();
   app.disable('x-powered-by');
+  app.use(helmet());
+  app.use(cors({ origin: config.corsOrigins || parseCorsOrigins() }));
   app.use(createResponseMiddleware({ platform }));
   app.use(
     express.json({

@@ -35,7 +35,7 @@ OpenAPI: `docs/openapi.yaml`. Postman: `postman/collections/service-dukcapil/`.
 
 ## Synthetic dataset
 
-Three invented NIKs in `src/modules/verification/verification.data.js`, all in the real Indonesian format so dummy data still looks authentic:
+Three invented NIKs in `src/infrastructure/data/synthetic-residents.js`, all in the real Indonesian format so dummy data still looks authentic:
 
 - `3171010101900001` — Jakarta Pusat, male, born 1 Jan 1990, sequence 0001.
 - `3171014101900002` — Jakarta Pusat, female, born 1 Jan 1990 (day + 40), sequence 0002.
@@ -73,18 +73,28 @@ curl -X POST http://localhost:8080/api/v1/verifications \
 | `npm run test:coverage` | Run tests and create LCOV, Cobertura, and JUnit reports.                     |
 | `npm run api:lint`      | Validate `docs/openapi.yaml`.                                                |
 | `npm run postman:run`   | Run the filesystem-first local Postman collection against a running service. |
-| `npm run check`         | Run format, lint, unit/integration tests, and OpenAPI linting.               |
+| `npm run check:boundaries` | Check the Onion layer dependency rule.                                     |
+| `npm run check`         | Run format, lint, boundary check, unit/integration tests, and OpenAPI linting. |
+
+## Security
+
+The service sets security headers with `helmet` (defaults) and restricts cross-origin requests with `cors`. Allowed origins are configurable via the `CORS_ORIGINS` environment variable (comma-separated); when unset or empty, the default applies:
+
+```text
+https://rusuh-tiket.web.id,https://www.rusuh-tiket.web.id,http://localhost:3000,http://localhost:5173
+```
 
 ## Project structure
 
 ```text
 src/
-  app.js                  Express application factory
+  app.js                  Express application factory (thin; calls the container)
   server.js               Process lifecycle and graceful shutdown
-  config/                 Validated runtime configuration
-  middleware/             Parser, response, 404, and error handling
-  modules/                Feature-local route/controller/service/validation code
-  infrastructure/         Optional in-memory cache adapter
+  container.js            Composition root (wires use cases, controllers, routers)
+  domain/                 Pure business logic (NIK format rules, verification lookup)
+  application/            Use cases (verification, health)
+  infrastructure/         Config, in-memory cache adapter, synthetic dataset
+  presentation/http/      Routes, controllers, middleware, validation
   platform/               Local platform shim (replaces the private template package)
 postman/                  Local v3 collection and environment
 docs/                     Architecture, configuration, deployment, OpenAPI
