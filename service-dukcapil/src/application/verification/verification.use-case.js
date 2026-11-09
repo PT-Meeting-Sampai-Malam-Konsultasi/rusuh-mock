@@ -9,7 +9,7 @@ const { verifyNik } = require('@/domain/verification');
  * @param {string[]} options.residents - Synthetic NIK dataset.
  * @returns {object} Verification operations.
  */
-function createVerificationUseCase({ residents }) {
+function createVerificationUseCase({ residents } = {}) {
   if (!residents) throw new Error('createVerificationUseCase requires residents');
   const knownNiks = new Set(residents);
 

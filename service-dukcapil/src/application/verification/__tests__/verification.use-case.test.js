@@ -28,4 +28,9 @@ describe('verification use case', () => {
     expect(useCase.verify({ nik: '3171010101900011' }).valid).toBe(true);
     expect(useCase.verify({ nik: '3171010101900001' }).reason).toBe('NIK_NOT_FOUND');
   });
+
+  test('requires a dataset', () => {
+    expect(() => createVerificationUseCase()).toThrow('createVerificationUseCase requires residents');
+    expect(() => createVerificationUseCase({})).toThrow('createVerificationUseCase requires residents');
+  });
 });

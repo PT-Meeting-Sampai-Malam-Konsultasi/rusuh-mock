@@ -63,18 +63,18 @@ curl -X POST http://localhost:8080/api/v1/verifications \
 
 ## Commands
 
-| Command                 | Purpose                                                                      |
-| ----------------------- | ---------------------------------------------------------------------------- |
-| `npm start`             | Start the HTTP server on `PORT` (default `8080`).                            |
-| `npm run lint`          | Check JavaScript style without modifying files.                              |
-| `npm run lint:fix`      | Apply ESLint fixes.                                                          |
-| `npm run format:check`  | Check Prettier formatting.                                                   |
-| `npm run test`          | Run Jest tests.                                                              |
-| `npm run test:coverage` | Run tests and create LCOV, Cobertura, and JUnit reports.                     |
-| `npm run api:lint`      | Validate `docs/openapi.yaml`.                                                |
-| `npm run postman:run`   | Run the filesystem-first local Postman collection against a running service. |
-| `npm run check:boundaries` | Check the Onion layer dependency rule.                                     |
-| `npm run check`         | Run format, lint, boundary check, unit/integration tests, and OpenAPI linting. |
+| Command                    | Purpose                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------ |
+| `npm start`                | Start the HTTP server on `PORT` (default `8080`).                              |
+| `npm run lint`             | Check JavaScript style without modifying files.                                |
+| `npm run lint:fix`         | Apply ESLint fixes.                                                            |
+| `npm run format:check`     | Check Prettier formatting.                                                     |
+| `npm run test`             | Run Jest tests.                                                                |
+| `npm run test:coverage`    | Run tests and create LCOV, Cobertura, and JUnit reports.                       |
+| `npm run api:lint`         | Validate `docs/openapi.yaml`.                                                  |
+| `npm run postman:run`      | Run the filesystem-first local Postman collection against a running service.   |
+| `npm run check:boundaries` | Check the Onion layer dependency rule.                                         |
+| `npm run check`            | Run format, lint, boundary check, unit/integration tests, and OpenAPI linting. |
 
 ## Security
 
