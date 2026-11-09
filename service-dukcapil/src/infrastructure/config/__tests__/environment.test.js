@@ -1,4 +1,4 @@
-const { loadEnvironment } = require('@/config/environment');
+const { loadEnvironment } = require('@/infrastructure/config/environment');
 
 describe('environment configuration', () => {
   test('loads defaults and ignores unrelated variables', () => {

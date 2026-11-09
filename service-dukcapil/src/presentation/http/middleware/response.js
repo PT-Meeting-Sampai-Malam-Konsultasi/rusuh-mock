@@ -1,10 +1,10 @@
-const defaultPlatform = require('@/platform/common');
+const defaultPlatform = require('./fallback-platform');
 
 /**
  * Creates middleware that applies the platform response envelope and logs completion.
  *
  * @param {object} options - Response middleware dependencies.
- * @param {object} [options.platform] - Platform helper implementation.
+ * @param {object} [options.platform] - Platform helper implementation (injected by app.js).
  * @returns {Function} Express middleware.
  */
 function createResponseMiddleware({ platform = defaultPlatform } = {}) {

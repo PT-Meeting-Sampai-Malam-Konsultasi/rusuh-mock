@@ -1,11 +1,11 @@
 const Boom = require('@hapi/boom');
-const defaultPlatform = require('@/platform/common');
+const defaultPlatform = require('./fallback-platform');
 
 /**
  * Creates the terminal Express error handler with safe client responses.
  *
  * @param {object} options - Error-handler dependencies.
- * @param {object} [options.platform] - Platform logging implementation.
+ * @param {object} [options.platform] - Platform logging implementation (injected by app.js).
  * @returns {Function} Express error middleware.
  */
 function createErrorHandler({ platform = defaultPlatform } = {}) {

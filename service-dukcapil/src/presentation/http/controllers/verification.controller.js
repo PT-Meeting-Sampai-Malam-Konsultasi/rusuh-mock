@@ -1,17 +1,17 @@
 const Boom = require('@hapi/boom');
-const { validateVerify } = require('./verification.validation');
+const { validateVerify } = require('../validation/verification.validation');
 
 /**
  * Creates controllers for the verification module.
  *
- * @param {object} service - Verification service.
+ * @param {object} useCase - Verification use case.
  * @returns {object} Verification controllers.
  */
-function createVerificationController(service) {
+function createVerificationController(useCase) {
   return {
     verify: (request, response, next) => {
       try {
-        const result = service.verify(validateVerify(request.body));
+        const result = useCase.verify(validateVerify(request.body));
         response.locals.skipResponseEnvelope = true;
         response.status(200).json({ data: result });
       } catch (error) {

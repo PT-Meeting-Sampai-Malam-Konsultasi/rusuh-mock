@@ -2,11 +2,11 @@ require('module-alias/register');
 
 const express = require('express');
 const defaultPlatform = require('@/platform/common');
-const { createDuplicateKeyVerifier } = require('@/middleware/duplicate-json-keys');
-const { createResponseMiddleware } = require('@/middleware/response');
-const { createErrorHandler } = require('@/middleware/error-handler');
-const { notFound } = require('@/middleware/not-found');
-const { mountRoutes } = require('@/routes');
+const { createDuplicateKeyVerifier } = require('@/presentation/http/middleware/duplicate-json-keys');
+const { createResponseMiddleware } = require('@/presentation/http/middleware/response');
+const { createErrorHandler } = require('@/presentation/http/middleware/error-handler');
+const { notFound } = require('@/presentation/http/middleware/not-found');
+const { createContainer } = require('@/container');
 
 /**
  * Builds an Express application without binding a network port or starting jobs.
@@ -28,6 +28,7 @@ function createApp({
 } = {}) {
   if (!config) throw new Error('createApp requires validated configuration');
 
+  const container = createContainer({ config, platform, usePlatformPreHandler, isReady, verificationDataset });
   const app = express();
   app.disable('x-powered-by');
   app.use(createResponseMiddleware({ platform }));
@@ -39,7 +40,8 @@ function createApp({
   );
   app.use(express.urlencoded({ extended: true, limit: config.bodyLimit }));
 
-  mountRoutes(app, { platform, usePlatformPreHandler, isReady, verificationDataset });
+  app.use(container.healthRouter);
+  app.use('/api/v1/verifications', container.verificationRouter);
   app.use(notFound);
   app.use(createErrorHandler({ platform }));
 

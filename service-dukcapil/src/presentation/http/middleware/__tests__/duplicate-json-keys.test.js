@@ -1,4 +1,7 @@
-const { createDuplicateKeyVerifier, detectDuplicateJsonKey } = require('@/middleware/duplicate-json-keys');
+const {
+  createDuplicateKeyVerifier,
+  detectDuplicateJsonKey
+} = require('@/presentation/http/middleware/duplicate-json-keys');
 
 describe('duplicate JSON key middleware', () => {
   test('finds duplicate keys in one object', () => {
