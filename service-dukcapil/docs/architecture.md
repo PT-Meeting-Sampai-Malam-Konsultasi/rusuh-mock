@@ -22,3 +22,9 @@ The service follows strict Onion / Clean Architecture (same layout as the rusuh-
 7. The terminal error middleware returns a safe Boom/body-parser response or masks an unexpected failure as `500`.
 
 The response adapter is for JSON-style API responses. Streaming and download endpoints must set `response.locals.skipResponseEnvelope = true` before writing.
+
+## Verification result and readiness
+
+Verification is format-only and surfaces a single reason code: any format failure (wrong length, non-digit characters, invalid birth-date component, sequence `0000`) returns `valid: false` with `reason: "NIK_INVALID_FORMAT"`, so clients map one code to one message.
+
+`/health/ready` runs a functional self-test of the verifier (a known-valid NIK must verify true, a known-invalid NIK must verify false) and answers `200 {"status":"ready"}` only when it passes, otherwise `503 {"status":"not_ready"}`. The service has no downstream dependency, so the self-test — not a dependency ping — is what "ready" means here.

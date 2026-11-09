@@ -34,6 +34,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/ReadyStatus'
+        '503':
+          $ref: '#/components/responses/NotReadyStatus'
   /api/v1/verifications:
     post:
       operationId: verifyNik
@@ -73,8 +75,8 @@ components:
         reason:
           type: string
           nullable: true
-          enum: [NIK_INVALID_FORMAT, NIK_INVALID_BIRTH_DATE, NIK_INVALID_SEQUENCE]
-          description: Null when valid; otherwise the format-specific reason code.
+          enum: [NIK_INVALID_FORMAT]
+          description: Null when valid; otherwise NIK_INVALID_FORMAT, the single code for any format failure.
     VerificationResponse:
       type: object
       required: [data]
@@ -114,6 +116,17 @@ components:
               status:
                 type: string
                 enum: [ready]
+    NotReadyStatus:
+      description: Service is up but its readiness self-test failed.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [status]
+            properties:
+              status:
+                type: string
+                enum: [not_ready]
     BadRequest:
       description: Request validation or JSON parsing failed.
       content:

@@ -13,10 +13,12 @@ const { createVerificationRouter } = require('@/presentation/http/routes/verific
  * @param {object} options - Container dependencies and runtime configuration.
  * @param {object} options.config - Validated service configuration.
  * @param {object} [options.platform] - Platform helper implementation.
+ * @param {Function} [options.isReady] - Optional asynchronous readiness
+ *   predicate, forwarded to the health use case.
  * @returns {object} Wired routers and use cases.
  */
-function createContainer({ config, platform = defaultPlatform } = {}) {
-  const healthUseCase = createHealthUseCase();
+function createContainer({ config, platform = defaultPlatform, isReady } = {}) {
+  const healthUseCase = createHealthUseCase({ isReady });
   const verificationUseCase = createVerificationUseCase();
   const healthController = createHealthController(healthUseCase);
   const verificationController = createVerificationController(verificationUseCase);

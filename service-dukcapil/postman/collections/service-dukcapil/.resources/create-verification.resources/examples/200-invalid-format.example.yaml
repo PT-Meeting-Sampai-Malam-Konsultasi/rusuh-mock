@@ -16,6 +16,6 @@ response:
         "data": {
           "nik": "3171010113900001",
           "valid": false,
-          "reason": "NIK_INVALID_BIRTH_DATE"
+          "reason": "NIK_INVALID_FORMAT"
         }
       }

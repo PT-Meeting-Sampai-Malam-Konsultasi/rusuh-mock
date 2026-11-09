@@ -46,25 +46,34 @@ describe('application factory', () => {
     });
   });
 
-  test('reports format-invalid NIKs as valid:false with a format reason, not an error', async () => {
+  test('reports format-invalid NIKs as valid:false with the single reason code, not an error', async () => {
     const app = createApp({ config, platform });
     const cases = [
-      ['123', 'NIK_INVALID_FORMAT'],
-      ['31710101019000AB', 'NIK_INVALID_FORMAT'],
-      ['3171010113900001', 'NIK_INVALID_BIRTH_DATE'],
-      ['3171013201900001', 'NIK_INVALID_BIRTH_DATE'],
-      ['3171013002900001', 'NIK_INVALID_BIRTH_DATE'],
-      ['3171010101900000', 'NIK_INVALID_SEQUENCE']
+      '123',
+      '31710101019000AB',
+      '3171010113900001',
+      '3171013201900001',
+      '3171013002900001',
+      '3171010101900000'
     ];
 
-    const responses = await Promise.all(cases.map(([nik]) => request(app).post('/api/v1/verifications').send({ nik })));
+    const responses = await Promise.all(cases.map((nik) => request(app).post('/api/v1/verifications').send({ nik })));
     responses.forEach((response, index) => {
       expect(response.status).toBe(200);
       expect(response.body.data).toEqual({
-        nik: cases[index][0],
+        nik: cases[index],
         valid: false,
-        reason: cases[index][1]
+        reason: 'NIK_INVALID_FORMAT'
       });
+    });
+  });
+
+  test('reports not_ready when the readiness check fails', async () => {
+    const app = createApp({ config, platform, isReady: async () => false });
+
+    await expect(request(app).get('/health/ready')).resolves.toMatchObject({
+      status: 503,
+      body: { status: 'not_ready' }
     });
   });
 

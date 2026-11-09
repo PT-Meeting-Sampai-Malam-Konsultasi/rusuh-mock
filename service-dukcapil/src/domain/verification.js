@@ -1,10 +1,9 @@
-const { NIK_FORMAT_REASONS, getNikFormatReason } = require('@/domain/nik');
-
-const VERIFICATION_REASONS = NIK_FORMAT_REASONS;
+const { getNikFormatReason } = require('@/domain/nik');
 
 /**
  * Verifies a NIK by format only. Pure: no I/O, no state, no dataset
- * lookup. Format-invalid NIKs are a result, never an error.
+ * lookup. Format-invalid NIKs are a result, never an error. Any format
+ * failure surfaces the single reason code NIK_INVALID_FORMAT.
  *
  * @param {string} nik - NIK to verify.
  * @returns {object} Verification result.
@@ -18,4 +17,4 @@ function verifyNik(nik) {
   return { nik, valid: true, reason: null };
 }
 
-module.exports = { VERIFICATION_REASONS, verifyNik };
+module.exports = { verifyNik };

@@ -17,12 +17,14 @@ const { createContainer } = require('@/container');
  * @param {object} options - Application dependencies and runtime configuration.
  * @param {object} options.config - Validated service configuration.
  * @param {object} [options.platform] - Platform helper implementation.
+ * @param {Function} [options.isReady] - Optional asynchronous readiness
+ *   predicate, forwarded to the container.
  * @returns {import('express').Express} Configured Express application.
  */
-function createApp({ config, platform = defaultPlatform } = {}) {
+function createApp({ config, platform = defaultPlatform, isReady } = {}) {
   if (!config) throw new Error('createApp requires validated configuration');
 
-  const container = createContainer({ config, platform });
+  const container = createContainer({ config, platform, isReady });
   const app = express();
   app.disable('x-powered-by');
   app.use(helmet());

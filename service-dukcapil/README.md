@@ -28,9 +28,7 @@ Response `200` (format-invalid NIKs are results, not errors):
 ```
 
 - `valid: true, reason: null` — NIK has a valid format. Verification is format-only: any NIK with a valid format verifies true; there is no dataset lookup.
-- `valid: false, reason: "NIK_INVALID_FORMAT"` — not 16 digits (wrong length or non-digit characters).
-- `valid: false, reason: "NIK_INVALID_BIRTH_DATE"` — birth-date component invalid (month outside 01-12, day invalid for the month, female day outside 41-71).
-- `valid: false, reason: "NIK_INVALID_SEQUENCE"` — sequence is 0000.
+- `valid: false, reason: "NIK_INVALID_FORMAT"` — any format failure (not 16 digits, invalid birth-date component, or sequence 0000). Clients map this single code to one message.
 - `400` — malformed request (missing nik, empty nik, non-string nik, malformed JSON, duplicate JSON keys when enabled).
 
 OpenAPI: `docs/openapi.yaml`. Postman: `postman/collections/service-dukcapil/`.

@@ -1,10 +1,10 @@
 const DAYS_IN_MONTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
-const NIK_FORMAT_REASONS = Object.freeze({
-  INVALID_FORMAT: 'NIK_INVALID_FORMAT',
-  INVALID_BIRTH_DATE: 'NIK_INVALID_BIRTH_DATE',
-  INVALID_SEQUENCE: 'NIK_INVALID_SEQUENCE'
-});
+// The single reason code surfaced for ANY format failure. The granular
+// checks below still decide validity (16 digits, birth-date component,
+// sequence), but they no longer surface as distinct codes: clients map
+// this one code to one message.
+const NIK_INVALID_FORMAT = 'NIK_INVALID_FORMAT';
 
 /**
  * Checks the structural format of an Indonesian NIK (16 digits):
@@ -17,19 +17,19 @@ const NIK_FORMAT_REASONS = Object.freeze({
  * sequence 0000 is rejected (sequences start at 0001).
  *
  * @param {unknown} nik - Candidate NIK.
- * @returns {string|null} Null when the format is valid, otherwise the
- * format-specific reason code.
+ * @returns {string|null} Null when the format is valid, otherwise
+ * NIK_INVALID_FORMAT.
  */
 function getNikFormatReason(nik) {
-  if (typeof nik !== 'string' || !/^\d{16}$/.test(nik)) return NIK_FORMAT_REASONS.INVALID_FORMAT;
+  if (typeof nik !== 'string' || !/^\d{16}$/.test(nik)) return NIK_INVALID_FORMAT;
 
   const month = Number(nik.slice(8, 10));
   let day = Number(nik.slice(6, 8));
   if (day > 40) day -= 40;
   if (month < 1 || month > 12 || day < 1 || day > DAYS_IN_MONTH[month - 1]) {
-    return NIK_FORMAT_REASONS.INVALID_BIRTH_DATE;
+    return NIK_INVALID_FORMAT;
   }
-  if (nik.slice(12, 16) === '0000') return NIK_FORMAT_REASONS.INVALID_SEQUENCE;
+  if (nik.slice(12, 16) === '0000') return NIK_INVALID_FORMAT;
 
   return null;
 }
@@ -44,4 +44,4 @@ function isValidNikFormat(nik) {
   return getNikFormatReason(nik) === null;
 }
 
-module.exports = { NIK_FORMAT_REASONS, getNikFormatReason, isValidNikFormat };
+module.exports = { NIK_INVALID_FORMAT, getNikFormatReason, isValidNikFormat };

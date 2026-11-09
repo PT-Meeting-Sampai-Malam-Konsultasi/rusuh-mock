@@ -14,9 +14,10 @@ function createHealthController(healthUseCase) {
       response.locals.skipResponseEnvelope = true;
       response.status(200).json(healthUseCase.live());
     },
-    ready: (_request, response) => {
+    ready: async (_request, response) => {
+      const result = await healthUseCase.ready();
       response.locals.skipResponseEnvelope = true;
-      response.status(200).json(healthUseCase.ready());
+      response.status(result.status === 'ready' ? 200 : 503).json(result);
     }
   };
 }

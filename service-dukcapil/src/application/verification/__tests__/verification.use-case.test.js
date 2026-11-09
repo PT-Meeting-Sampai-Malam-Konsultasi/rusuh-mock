@@ -22,7 +22,7 @@ describe('verification use case (format-only)', () => {
     });
   });
 
-  test('reports format-invalid NIKs with a format-specific reason', () => {
+  test('reports every format-invalid NIK with the single NIK_INVALID_FORMAT reason', () => {
     const useCase = createVerificationUseCase();
 
     expect(useCase.verify({ nik: '123' })).toEqual({
@@ -33,12 +33,12 @@ describe('verification use case (format-only)', () => {
     expect(useCase.verify({ nik: '3171010113900001' })).toEqual({
       nik: '3171010113900001',
       valid: false,
-      reason: 'NIK_INVALID_BIRTH_DATE'
+      reason: 'NIK_INVALID_FORMAT'
     });
     expect(useCase.verify({ nik: '3171010101900000' })).toEqual({
       nik: '3171010101900000',
       valid: false,
-      reason: 'NIK_INVALID_SEQUENCE'
+      reason: 'NIK_INVALID_FORMAT'
     });
   });
 });

@@ -1,4 +1,4 @@
-const { isValidNikFormat, getNikFormatReason, NIK_FORMAT_REASONS } = require('@/domain/nik');
+const { isValidNikFormat, getNikFormatReason, NIK_INVALID_FORMAT } = require('@/domain/nik');
 
 describe('NIK format validation', () => {
   test('accepts male and female NIKs with valid birth dates', () => {
@@ -32,22 +32,38 @@ describe('NIK format reason codes', () => {
     expect(getNikFormatReason('3171010101900001')).toBeNull();
   });
 
-  test('returns NIK_INVALID_FORMAT for non-16-digit or non-digit input', () => {
-    expect(getNikFormatReason('123')).toBe(NIK_FORMAT_REASONS.INVALID_FORMAT);
-    expect(getNikFormatReason('31710101019000AB')).toBe(NIK_FORMAT_REASONS.INVALID_FORMAT);
-    expect(getNikFormatReason('31710101019000011')).toBe(NIK_FORMAT_REASONS.INVALID_FORMAT);
-    expect(getNikFormatReason(3171010101900001)).toBe(NIK_FORMAT_REASONS.INVALID_FORMAT);
-    expect(getNikFormatReason(undefined)).toBe(NIK_FORMAT_REASONS.INVALID_FORMAT);
+  test('returns the single NIK_INVALID_FORMAT code for non-16-digit or non-digit input', () => {
+    expect(getNikFormatReason('123')).toBe(NIK_INVALID_FORMAT);
+    expect(getNikFormatReason('31710101019000AB')).toBe(NIK_INVALID_FORMAT);
+    expect(getNikFormatReason('31710101019000011')).toBe(NIK_INVALID_FORMAT);
+    expect(getNikFormatReason(3171010101900001)).toBe(NIK_INVALID_FORMAT);
+    expect(getNikFormatReason(undefined)).toBe(NIK_INVALID_FORMAT);
   });
 
-  test('returns NIK_INVALID_BIRTH_DATE for an invalid date component', () => {
-    expect(getNikFormatReason('3171010113900001')).toBe(NIK_FORMAT_REASONS.INVALID_BIRTH_DATE);
-    expect(getNikFormatReason('3171013201900001')).toBe(NIK_FORMAT_REASONS.INVALID_BIRTH_DATE);
-    expect(getNikFormatReason('3171013002900001')).toBe(NIK_FORMAT_REASONS.INVALID_BIRTH_DATE);
-    expect(getNikFormatReason('3171017201900001')).toBe(NIK_FORMAT_REASONS.INVALID_BIRTH_DATE);
+  test('returns the single NIK_INVALID_FORMAT code for an invalid date component', () => {
+    expect(getNikFormatReason('3171010113900001')).toBe(NIK_INVALID_FORMAT);
+    expect(getNikFormatReason('3171013201900001')).toBe(NIK_INVALID_FORMAT);
+    expect(getNikFormatReason('3171013002900001')).toBe(NIK_INVALID_FORMAT);
+    expect(getNikFormatReason('3171017201900001')).toBe(NIK_INVALID_FORMAT);
   });
 
-  test('returns NIK_INVALID_SEQUENCE for sequence 0000', () => {
-    expect(getNikFormatReason('3171010101900000')).toBe(NIK_FORMAT_REASONS.INVALID_SEQUENCE);
+  test('returns the single NIK_INVALID_FORMAT code for sequence 0000', () => {
+    expect(getNikFormatReason('3171010101900000')).toBe(NIK_INVALID_FORMAT);
+  });
+
+  test('every kind of format failure maps to the same single code', () => {
+    const failures = [
+      '123', // wrong length
+      '31710101019000AB', // non-digit characters
+      '3171010113900001', // month 13
+      '3171013201900001', // day 32
+      '3171013002900001', // 30 Feb
+      '3171017201900001', // female day 72
+      '3171010101900000' // sequence 0000
+    ];
+
+    failures.forEach((nik) => {
+      expect(getNikFormatReason(nik)).toBe(NIK_INVALID_FORMAT);
+    });
   });
 });
