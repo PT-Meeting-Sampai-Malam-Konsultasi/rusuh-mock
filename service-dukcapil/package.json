@@ -49,7 +49,8 @@
   },
   "scripts": {
     "api:lint": "redocly lint docs/openapi.yaml",
-    "check": "npm run format:check && npm run lint && npm run test:coverage && npm run api:lint",
+    "check": "npm run format:check && npm run lint && npm run check:boundaries && npm run test:coverage && npm run api:lint",
+    "check:boundaries": "node ../scripts/check-boundaries.js .",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint": "eslint .",
