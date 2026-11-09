@@ -1,16 +1,10 @@
 const Joi = require('joi');
-const { isValidNikFormat } = require('@/domain/nik');
 
+// Only the request shape is validated here: nik must be a present,
+// non-empty string. Format checking lives in the domain
+// (getNikFormatReason) and returns a valid:false result, never a 400.
 const verifySchema = Joi.object({
-  nik: Joi.string()
-    .custom((value, helpers) => {
-      if (!isValidNikFormat(value)) return helpers.error('nik.invalid');
-      return value;
-    })
-    .required()
-    .messages({
-      'nik.invalid': '"nik" must be a valid Indonesian NIK (16 digits with a valid birth date component)'
-    })
+  nik: Joi.string().min(1).required()
 });
 
 /**
@@ -18,7 +12,7 @@ const verifySchema = Joi.object({
  *
  * @param {unknown} payload - Request body.
  * @returns {object} Validated and normalized payload.
- * @throws {Error} When the request body is invalid.
+ * @throws {Error} When the request body is malformed.
  */
 function validateVerify(payload) {
   const { error, value } = verifySchema.validate(payload, { abortEarly: false, stripUnknown: true });

@@ -26,7 +26,7 @@ describe('container (composition root)', () => {
     expect(() => createApp()).toThrow('createApp requires validated configuration');
   });
 
-  test('wires routers and use cases with the default dataset', () => {
+  test('wires routers and use cases', () => {
     const container = createContainer({ config });
 
     expect(typeof container.healthRouter).toBe('function');
@@ -37,22 +37,7 @@ describe('container (composition root)', () => {
       valid: true,
       reason: null
     });
-  });
-
-  test('wires an injected dataset', () => {
-    const container = createContainer({ config, verificationDataset: ['3171010101900011'] });
-
-    expect(container.verificationUseCase.verify({ nik: '3171010101900011' }).valid).toBe(true);
-    expect(container.verificationUseCase.verify({ nik: '3171010101900001' }).reason).toBe('NIK_NOT_FOUND');
-  });
-
-  test('applies the platform preHandler when enabled', async () => {
-    const preHandler = jest.fn((_request, _response, next) => next());
-    const app = createApp({ config, platform: { ...platform, preHandler }, usePlatformPreHandler: true });
-
-    await request(app).post('/api/v1/verifications').send({ nik: '3171010101900001' });
-
-    expect(preHandler).toHaveBeenCalled();
+    expect(container.verificationUseCase.verify({ nik: '3171010101900099' }).valid).toBe(true);
   });
 
   test('reflects a configured CORS origin', async () => {

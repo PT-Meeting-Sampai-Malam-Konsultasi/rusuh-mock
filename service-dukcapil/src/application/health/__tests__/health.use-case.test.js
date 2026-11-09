@@ -5,8 +5,7 @@ describe('health use case', () => {
     expect(createHealthUseCase().live()).toEqual({ status: 'ok' });
   });
 
-  test('reports unavailable readiness', async () => {
-    const useCase = createHealthUseCase({ isReady: async () => false });
-    await expect(useCase.ready()).resolves.toEqual({ status: 'not_ready' });
+  test('reports ready status unconditionally', () => {
+    expect(createHealthUseCase().ready()).toEqual({ status: 'ready' });
   });
 });

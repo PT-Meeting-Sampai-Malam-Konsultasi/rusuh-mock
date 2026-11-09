@@ -21,15 +21,17 @@ Real-format rules checked (structure, not a registry lookup):
 - Sequence not 0000 (sequences start at 0001).
 - Region codes are not checked against the Kemendagri table (that needs the full region registry).
 
-Response `200` (unknown NIKs are results, not errors):
+Response `200` (format-invalid NIKs are results, not errors):
 
 ```json
 { "data": { "nik": "3171010101900001", "valid": true, "reason": null } }
 ```
 
-- `valid: true, reason: null` — NIK found in the dataset.
-- `valid: false, reason: "NIK_NOT_FOUND"` — NIK not in the dataset.
-- `400` — malformed request (NIK failing the real-format rules, missing nik, malformed JSON, duplicate JSON keys when enabled).
+- `valid: true, reason: null` — NIK has a valid format. Verification is format-only: any NIK with a valid format verifies true; there is no dataset lookup.
+- `valid: false, reason: "NIK_INVALID_FORMAT"` — not 16 digits (wrong length or non-digit characters).
+- `valid: false, reason: "NIK_INVALID_BIRTH_DATE"` — birth-date component invalid (month outside 01-12, day invalid for the month, female day outside 41-71).
+- `valid: false, reason: "NIK_INVALID_SEQUENCE"` — sequence is 0000.
+- `400` — malformed request (missing nik, empty nik, non-string nik, malformed JSON, duplicate JSON keys when enabled).
 
 OpenAPI: `docs/openapi.yaml`. Postman: `postman/collections/service-dukcapil/`.
 
@@ -41,7 +43,7 @@ Three invented NIKs in `src/infrastructure/data/synthetic-residents.js`, all in 
 - `3171014101900002` — Jakarta Pusat, female, born 1 Jan 1990 (day + 40), sequence 0002.
 - `3271010202850003` — Kota Bogor, male, born 2 Feb 1985, sequence 0003.
 
-The persons are invented, but because the format is real, an entry could in theory coincide with a real person's NIK — everything in this repo is marked synthetic for that reason. The dataset is fixed and tiny by design: verification must be deterministic (same input → same response) so demos and tests never go flaky.
+The persons are invented, but because the format is real, an entry could in theory coincide with a real person's NIK — everything in this repo is marked synthetic for that reason. The dataset is fixed and tiny by design and is kept in source as an intentional fixture for tests and documentation examples: verification never reads it at runtime (format-only — same input → same response) so demos and tests never go flaky.
 
 ## Quick start
 
@@ -91,9 +93,9 @@ src/
   app.js                  Express application factory (thin; calls the container)
   server.js               Process lifecycle and graceful shutdown
   container.js            Composition root (wires use cases, controllers, routers)
-  domain/                 Pure business logic (NIK format rules, verification lookup)
+  domain/                 Pure business logic (NIK format rules, format-only verification)
   application/            Use cases (verification, health)
-  infrastructure/         Config, in-memory cache adapter, synthetic dataset
+  infrastructure/         Config, synthetic dataset (test fixture)
   presentation/http/      Routes, controllers, middleware, validation
   platform/               Local platform shim (replaces the private template package)
 postman/                  Local v3 collection and environment
@@ -106,7 +108,7 @@ The consuming service calls this mock at purchase time (when ticket NIKs are ent
 
 ## Deviations from the boilerplate template
 
-- Private Telkomsel packages (`module-common-function`, `module-config-db`) removed: they require JFrog credentials that do not exist outside Telkomsel, which would make this public repo un-installable. Replaced by `src/platform/common.js`, a minimal local shim implementing only the surface the service uses (chainable console logger, no-op metadata, pass-through preHandler). All template calls to the platform use optional chaining, so behavior is preserved.
+- Private Telkomsel packages (`module-common-function`, `module-config-db`) removed: they require JFrog credentials that do not exist outside Telkomsel, which would make this public repo un-installable. Replaced by `src/platform/common.js`, a minimal local shim implementing only the surface the service uses (chainable console logger, no-op metadata). All template calls to the platform use optional chaining, so behavior is preserved.
 - Config-DB adapter removed (it depended on the private package and the mock needs no config DB); `CONFIG_DB_*` variables removed.
 - Outbound HTTP adapter removed (the mock calls no upstream).
 - `sample-resource` example module replaced by the `verification` module.

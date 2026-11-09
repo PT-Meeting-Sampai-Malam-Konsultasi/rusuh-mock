@@ -1,14 +1,14 @@
 /**
  * Creates health operations for liveness and readiness endpoints.
+ * Readiness is unconditional: the service has no external
+ * dependencies to wait for, so it is ready once it can respond.
  *
- * @param {object} options - Health dependencies.
- * @param {Function} [options.isReady] - Optional asynchronous readiness predicate.
  * @returns {object} Health operations.
  */
-function createHealthUseCase({ isReady = async () => true } = {}) {
+function createHealthUseCase() {
   return {
     live: () => ({ status: 'ok' }),
-    ready: async () => ({ status: (await isReady()) ? 'ready' : 'not_ready' })
+    ready: () => ({ status: 'ready' })
   };
 }
 

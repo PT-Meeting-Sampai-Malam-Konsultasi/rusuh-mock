@@ -1,36 +1,44 @@
 const { SYNTHETIC_RESIDENTS } = require('@/infrastructure/data/synthetic-residents');
 const { createVerificationUseCase } = require('@/application/verification/verification.use-case');
 
-describe('verification use case', () => {
-  test('accepts a known NIK', () => {
-    const useCase = createVerificationUseCase({ residents: SYNTHETIC_RESIDENTS });
+// The synthetic dataset is used here only as a fixture: known
+// format-valid NIKs. Verification itself never looks it up.
+describe('verification use case (format-only)', () => {
+  test('accepts format-valid NIKs from the fixture dataset', () => {
+    const useCase = createVerificationUseCase();
 
-    expect(useCase.verify({ nik: '3171010101900001' })).toEqual({
-      nik: '3171010101900001',
+    SYNTHETIC_RESIDENTS.forEach((nik) => {
+      expect(useCase.verify({ nik })).toEqual({ nik, valid: true, reason: null });
+    });
+  });
+
+  test('accepts a format-valid NIK that is not in the fixture dataset', () => {
+    const useCase = createVerificationUseCase();
+
+    expect(useCase.verify({ nik: '3171010101900099' })).toEqual({
+      nik: '3171010101900099',
       valid: true,
       reason: null
     });
   });
 
-  test('rejects an unknown NIK without throwing', () => {
-    const useCase = createVerificationUseCase({ residents: SYNTHETIC_RESIDENTS });
+  test('reports format-invalid NIKs with a format-specific reason', () => {
+    const useCase = createVerificationUseCase();
 
-    expect(useCase.verify({ nik: '3171010101900099' })).toEqual({
-      nik: '3171010101900099',
+    expect(useCase.verify({ nik: '123' })).toEqual({
+      nik: '123',
       valid: false,
-      reason: 'NIK_NOT_FOUND'
+      reason: 'NIK_INVALID_FORMAT'
     });
-  });
-
-  test('accepts an injected dataset', () => {
-    const useCase = createVerificationUseCase({ residents: ['3171010101900011'] });
-
-    expect(useCase.verify({ nik: '3171010101900011' }).valid).toBe(true);
-    expect(useCase.verify({ nik: '3171010101900001' }).reason).toBe('NIK_NOT_FOUND');
-  });
-
-  test('requires a dataset', () => {
-    expect(() => createVerificationUseCase()).toThrow('createVerificationUseCase requires residents');
-    expect(() => createVerificationUseCase({})).toThrow('createVerificationUseCase requires residents');
+    expect(useCase.verify({ nik: '3171010113900001' })).toEqual({
+      nik: '3171010113900001',
+      valid: false,
+      reason: 'NIK_INVALID_BIRTH_DATE'
+    });
+    expect(useCase.verify({ nik: '3171010101900000' })).toEqual({
+      nik: '3171010101900000',
+      valid: false,
+      reason: 'NIK_INVALID_SEQUENCE'
+    });
   });
 });

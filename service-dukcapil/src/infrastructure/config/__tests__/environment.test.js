@@ -5,7 +5,6 @@ describe('environment configuration', () => {
     const config = loadEnvironment({ PATH: '/usr/bin', HOME: '/root', PORT: '18081' });
 
     expect(config.port).toBe(18081);
-    expect(config.cache.enabled).toBe(false);
   });
 
   test('rejects invalid known variables', () => {

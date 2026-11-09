@@ -1,18 +1,18 @@
-const VERIFICATION_REASONS = Object.freeze({
-  NIK_NOT_FOUND: 'NIK_NOT_FOUND'
-});
+const { NIK_FORMAT_REASONS, getNikFormatReason } = require('@/domain/nik');
+
+const VERIFICATION_REASONS = NIK_FORMAT_REASONS;
 
 /**
- * Verifies a NIK against a known-NIK set. Pure: no I/O, no state.
- * Unknown NIKs are a result, never an error.
+ * Verifies a NIK by format only. Pure: no I/O, no state, no dataset
+ * lookup. Format-invalid NIKs are a result, never an error.
  *
- * @param {Set<string>} knownNiks - NIKs present in the dataset.
- * @param {string} nik - 16-digit NIK to verify.
+ * @param {string} nik - NIK to verify.
  * @returns {object} Verification result.
  */
-function verifyNik(knownNiks, nik) {
-  if (!knownNiks.has(nik)) {
-    return { nik, valid: false, reason: VERIFICATION_REASONS.NIK_NOT_FOUND };
+function verifyNik(nik) {
+  const reason = getNikFormatReason(nik);
+  if (reason) {
+    return { nik, valid: false, reason };
   }
 
   return { nik, valid: true, reason: null };

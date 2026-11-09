@@ -37,30 +37,35 @@ describe('application factory', () => {
     expect(response.body.data).toEqual({ nik: '3171010101900001', valid: true, reason: null });
   });
 
-  test('reports an unknown NIK as valid:false, not an error', async () => {
+  test('accepts a format-valid NIK that is not in the fixture dataset', async () => {
     const app = createApp({ config, platform });
 
     await expect(request(app).post('/api/v1/verifications').send({ nik: '3171010101900099' })).resolves.toMatchObject({
       status: 200,
-      body: { data: { valid: false, reason: 'NIK_NOT_FOUND' } }
+      body: { data: { nik: '3171010101900099', valid: true, reason: null } }
     });
   });
 
-  test('rejects NIKs with an invalid real format', async () => {
+  test('reports format-invalid NIKs as valid:false with a format reason, not an error', async () => {
     const app = createApp({ config, platform });
-    const invalidNiks = [
-      '123',
-      '31710101019000AB',
-      '3171010113900001',
-      '3171013201900001',
-      '3171013002900001',
-      '3171010101900000'
+    const cases = [
+      ['123', 'NIK_INVALID_FORMAT'],
+      ['31710101019000AB', 'NIK_INVALID_FORMAT'],
+      ['3171010113900001', 'NIK_INVALID_BIRTH_DATE'],
+      ['3171013201900001', 'NIK_INVALID_BIRTH_DATE'],
+      ['3171013002900001', 'NIK_INVALID_BIRTH_DATE'],
+      ['3171010101900000', 'NIK_INVALID_SEQUENCE']
     ];
 
-    const responses = await Promise.all(
-      invalidNiks.map((nik) => request(app).post('/api/v1/verifications').send({ nik }))
-    );
-    responses.forEach((response) => expect(response.status).toBe(400));
+    const responses = await Promise.all(cases.map(([nik]) => request(app).post('/api/v1/verifications').send({ nik })));
+    responses.forEach((response, index) => {
+      expect(response.status).toBe(200);
+      expect(response.body.data).toEqual({
+        nik: cases[index][0],
+        valid: false,
+        reason: cases[index][1]
+      });
+    });
   });
 
   test('returns validation, malformed JSON, and not-found errors safely', async () => {

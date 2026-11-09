@@ -15,12 +15,4 @@ describe('fallback platform (presentation-local no-op)', () => {
     expect(fallback.logRequest()).toEqual({});
     expect(fallback.unifyResponse()).toBeUndefined();
   });
-
-  test('preHandler passes through', () => {
-    const next = jest.fn();
-
-    fallback.preHandler({}, {}, next);
-
-    expect(next).toHaveBeenCalledTimes(1);
-  });
 });

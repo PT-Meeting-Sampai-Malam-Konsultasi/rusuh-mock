@@ -26,8 +26,4 @@ function unifyResponse() {
   return undefined;
 }
 
-function preHandler(_request, _response, next) {
-  next();
-}
-
-module.exports = { LoggerBuilder, logRequest, unifyResponse, preHandler };
+module.exports = { LoggerBuilder, logRequest, unifyResponse };

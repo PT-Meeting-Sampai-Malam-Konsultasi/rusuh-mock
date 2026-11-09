@@ -2,13 +2,13 @@
 
 The service follows strict Onion / Clean Architecture (same layout as the rusuh-core modules). Dependencies point inward only; the rule is enforced by `scripts/check-boundaries.js` (repo root), wired into `npm run check` as `check:boundaries`.
 
-- `src/domain/` — pure business logic: NIK format rules and the dataset lookup. Only node built-ins and other domain files.
+- `src/domain/` — pure business logic: NIK format rules and format-only verification. Only node built-ins and other domain files.
 - `src/application/` — use cases (verification, health). May import application, domain, and npm packages.
-- `src/infrastructure/` — adapters: validated configuration, the optional in-memory cache adapter, and the synthetic resident dataset. Never imports presentation.
+- `src/infrastructure/` — adapters: validated configuration and the synthetic resident dataset (test fixture and documentation examples only — never a runtime lookup). Never imports presentation.
 - `src/presentation/http/` — routes, controllers, middleware, and validation. Never imports infrastructure. The platform shim is received by injection, never imported directly (a local no-op fallback lives in `presentation/http/middleware/fallback-platform.js`).
 - `src/container.js` — the composition root: the only place that imports from every layer to wire use cases, controllers, and routers together.
 - `src/app.js` — thin: calls the container and mounts routes. Exposes `createApp()`, allowing Supertest and consumers to create an Express app without binding a port.
-- `src/server.js` — loads configuration, creates optional infrastructure, binds the HTTP port, and handles shutdown signals.
+- `src/server.js` — loads configuration, binds the HTTP port, and handles shutdown signals.
 - `src/platform/` is a minimal local platform shim replacing the boilerplate's private `module-common-function` package (see the service README for why).
 
 ## Request flow

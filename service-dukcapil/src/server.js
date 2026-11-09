@@ -5,7 +5,6 @@ const http = require('http');
 const defaultPlatform = require('@/platform/common');
 const { loadEnvironment } = require('@/infrastructure/config/environment');
 const { createApp } = require('@/app');
-const { createMemoryCache } = require('@/infrastructure/cache/memory-cache');
 
 /**
  * Starts the HTTP server and registers controlled shutdown handlers.
@@ -14,7 +13,6 @@ const { createMemoryCache } = require('@/infrastructure/cache/memory-cache');
  */
 function startServer() {
   const config = loadEnvironment();
-  const cache = config.cache.enabled ? createMemoryCache(config.cache) : undefined;
   const app = createApp({ config });
   const server = http.createServer(app);
   let shuttingDown = false;
@@ -31,7 +29,6 @@ function startServer() {
 
     const logger = defaultPlatform.LoggerBuilder?.getLogger?.();
     logger?.addTags?.(['server', 'shutdown'])?.addData?.({ signal })?.info?.('Graceful shutdown started');
-    cache?.clear();
 
     const timeout = setTimeout(() => process.exit(1), config.gracefulShutdownTimeoutMs);
     timeout.unref();

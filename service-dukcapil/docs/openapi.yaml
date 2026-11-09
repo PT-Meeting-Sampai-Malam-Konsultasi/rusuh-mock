@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: service-dukcapil API
   version: 1.0.0
-  description: 'Dukcapil NIK verification mock for rusuh. Proposed contract (see the service README): NIK-only verification against a synthetic dataset, real Indonesian NIK format, deterministic, not a production verification path.'
+  description: 'Dukcapil NIK verification mock for rusuh. Proposed contract (see the service README): format-only NIK verification, real Indonesian NIK format, deterministic, not a production verification path.'
 servers:
   - url: http://localhost:8080
 # All endpoints are intentionally unauthenticated: this is a local mock.
@@ -34,12 +34,10 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/ReadyStatus'
-        '503':
-          $ref: '#/components/responses/NotReadyStatus'
   /api/v1/verifications:
     post:
       operationId: verifyNik
-      summary: Verifies a NIK against the synthetic dataset.
+      summary: Verifies a NIK's format only (no dataset lookup).
       requestBody:
         required: true
         content:
@@ -48,7 +46,7 @@ paths:
               $ref: '#/components/schemas/VerifyRequest'
       responses:
         '200':
-          description: Verification result (unknown NIKs are valid:false results, not errors).
+          description: Verification result (format-invalid NIKs are valid:false results, not errors).
           content:
             application/json:
               schema:
@@ -63,7 +61,7 @@ components:
       properties:
         nik:
           type: string
-          description: NIK to verify, in the real Indonesian format (16 digits with a valid birth date component).
+          description: 'NIK to verify, in the real Indonesian format (16 digits with a valid birth date component). Format-only: any NIK with a valid format verifies true.'
     VerificationResult:
       type: object
       required: [nik, valid, reason]
@@ -75,8 +73,8 @@ components:
         reason:
           type: string
           nullable: true
-          enum: [NIK_NOT_FOUND]
-          description: Null when valid.
+          enum: [NIK_INVALID_FORMAT, NIK_INVALID_BIRTH_DATE, NIK_INVALID_SEQUENCE]
+          description: Null when valid; otherwise the format-specific reason code.
     VerificationResponse:
       type: object
       required: [data]
@@ -116,17 +114,6 @@ components:
               status:
                 type: string
                 enum: [ready]
-    NotReadyStatus:
-      description: Service initialization has not completed.
-      content:
-        application/json:
-          schema:
-            type: object
-            required: [status]
-            properties:
-              status:
-                type: string
-                enum: [not_ready]
     BadRequest:
       description: Request validation or JSON parsing failed.
       content:

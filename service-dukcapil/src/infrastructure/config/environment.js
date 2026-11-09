@@ -29,9 +29,6 @@ const environmentSchema = Joi.object({
   BODY_LIMIT: Joi.string().default('100kb'),
   CORS_ORIGINS: Joi.string().allow('').optional(),
   ENABLE_DUPLICATE_JSON_KEY_VALIDATION: Joi.boolean().truthy('true').falsy('false').default(false),
-  CACHE_ENABLED: Joi.boolean().truthy('true').falsy('false').default(false),
-  CACHE_MAX_ENTRIES: Joi.number().integer().positive().default(500),
-  CACHE_TTL_MS: Joi.number().integer().positive().default(900000),
   GRACEFUL_SHUTDOWN_TIMEOUT_MS: Joi.number().integer().positive().default(10000)
 }).unknown(true);
 
@@ -59,11 +56,6 @@ function loadEnvironment(environment = process.env) {
     bodyLimit: value.BODY_LIMIT,
     corsOrigins: parseCorsOrigins(value.CORS_ORIGINS),
     enableDuplicateJsonKeyValidation: value.ENABLE_DUPLICATE_JSON_KEY_VALIDATION,
-    cache: {
-      enabled: value.CACHE_ENABLED,
-      maxEntries: value.CACHE_MAX_ENTRIES,
-      ttlMs: value.CACHE_TTL_MS
-    },
     gracefulShutdownTimeoutMs: value.GRACEFUL_SHUTDOWN_TIMEOUT_MS
   };
 }

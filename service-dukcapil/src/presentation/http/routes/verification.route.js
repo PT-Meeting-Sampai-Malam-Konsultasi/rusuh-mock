@@ -1,17 +1,16 @@
 const express = require('express');
 
 /**
- * Creates the versioned verification router.
+ * Creates the versioned verification router. The endpoints are
+ * intentionally unauthenticated: this is a local mock.
  *
  * @param {object} controller - Verification controllers.
- * @param {Function} [preHandler] - Optional platform authentication middleware.
  * @returns {import('express').Router} Express verification router.
  */
-function createVerificationRouter(controller, preHandler) {
+function createVerificationRouter(controller) {
   const router = express.Router();
-  const middleware = typeof preHandler === 'function' ? [preHandler] : [];
 
-  router.post('/', ...middleware, controller.verify);
+  router.post('/', controller.verify);
 
   return router;
 }

@@ -1,27 +1,21 @@
 const { verifyNik } = require('@/domain/verification');
 
 /**
- * Creates the deterministic NIK verification use case. The dataset is
- * received by injection (the container supplies the synthetic
- * residents); the use case never imports infrastructure.
+ * Creates the deterministic NIK verification use case. Verification
+ * is format-only: no dataset, no file lookup, no I/O.
  *
- * @param {object} options - Use-case dependencies.
- * @param {string[]} options.residents - Synthetic NIK dataset.
  * @returns {object} Verification operations.
  */
-function createVerificationUseCase({ residents } = {}) {
-  if (!residents) throw new Error('createVerificationUseCase requires residents');
-  const knownNiks = new Set(residents);
-
+function createVerificationUseCase() {
   return {
     /**
-     * Verifies a NIK against the synthetic dataset.
+     * Verifies a NIK by format only.
      *
      * @param {object} input - Validated verification input.
-     * @param {string} input.nik - 16-digit NIK to verify.
-     * @returns {object} Verification result (unknown NIKs never throw).
+     * @param {string} input.nik - NIK to verify.
+     * @returns {object} Verification result (format-invalid NIKs never throw).
      */
-    verify: ({ nik }) => verifyNik(knownNiks, nik)
+    verify: ({ nik }) => verifyNik(nik)
   };
 }
 

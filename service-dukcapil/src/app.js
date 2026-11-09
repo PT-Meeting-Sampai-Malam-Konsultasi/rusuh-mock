@@ -17,21 +17,12 @@ const { createContainer } = require('@/container');
  * @param {object} options - Application dependencies and runtime configuration.
  * @param {object} options.config - Validated service configuration.
  * @param {object} [options.platform] - Platform helper implementation.
- * @param {boolean} [options.usePlatformPreHandler] - Whether routes use platform authentication.
- * @param {Function} [options.isReady] - Optional readiness predicate.
- * @param {object[]} [options.verificationDataset] - Optional synthetic resident dataset for tests.
  * @returns {import('express').Express} Configured Express application.
  */
-function createApp({
-  config,
-  platform = defaultPlatform,
-  usePlatformPreHandler = false,
-  isReady,
-  verificationDataset
-} = {}) {
+function createApp({ config, platform = defaultPlatform } = {}) {
   if (!config) throw new Error('createApp requires validated configuration');
 
-  const container = createContainer({ config, platform, usePlatformPreHandler, isReady, verificationDataset });
+  const container = createContainer({ config, platform });
   const app = express();
   app.disable('x-powered-by');
   app.use(helmet());
