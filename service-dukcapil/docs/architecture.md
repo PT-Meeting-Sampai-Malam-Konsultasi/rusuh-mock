@@ -1,21 +1,24 @@
 # Architecture
 
-The service separates process lifecycle from application assembly:
+The service follows strict Onion / Clean Architecture (same layout as the rusuh-core modules). Dependencies point inward only; the rule is enforced by `scripts/check-boundaries.js` (repo root), wired into `npm run check` as `check:boundaries`.
 
-- `src/server.js` loads configuration, creates optional infrastructure, binds the HTTP port, and handles shutdown signals.
-- `src/app.js` exposes `createApp()`, allowing Supertest and consumers to create an Express app without binding a port.
-- `src/middleware/` owns cross-cutting concerns: duplicate JSON-key rejection, response/log handling, 404 handling, and terminal error handling.
-- `src/modules/` uses feature-local route, controller, service, validation, and constants files.
-- `src/infrastructure/` keeps the optional in-memory cache adapter away from business modules.
+- `src/domain/` — pure business logic: NIK format rules and the dataset lookup. Only node built-ins and other domain files.
+- `src/application/` — use cases (verification, health). May import application, domain, and npm packages.
+- `src/infrastructure/` — adapters: validated configuration, the optional in-memory cache adapter, and the synthetic resident dataset. Never imports presentation.
+- `src/presentation/http/` — routes, controllers, middleware, and validation. Never imports infrastructure. The platform shim is received by injection, never imported directly (a local no-op fallback lives in `presentation/http/middleware/fallback-platform.js`).
+- `src/container.js` — the composition root: the only place that imports from every layer to wire use cases, controllers, and routers together.
+- `src/app.js` — thin: calls the container and mounts routes. Exposes `createApp()`, allowing Supertest and consumers to create an Express app without binding a port.
+- `src/server.js` — loads configuration, creates optional infrastructure, binds the HTTP port, and handles shutdown signals.
 - `src/platform/` is a minimal local platform shim replacing the boilerplate's private `module-common-function` package (see the service README for why).
 
 ## Request flow
 
 1. Express disables `x-powered-by`.
-2. The response adapter registers completion logging and may apply the organization response envelope.
-3. JSON and URL-encoded parsers run. Duplicate JSON-key detection only runs when enabled.
-4. Operational and versioned feature routes run.
-5. Unknown routes pass to the 404 middleware.
-6. The terminal error middleware returns a safe Boom/body-parser response or masks an unexpected failure as `500`.
+2. Helmet sets security headers; CORS allows only the configured origins (`CORS_ORIGINS`, see README).
+3. The response adapter registers completion logging and may apply the organization response envelope.
+4. JSON and URL-encoded parsers run. Duplicate JSON-key detection only runs when enabled.
+5. Operational and versioned feature routes run.
+6. Unknown routes pass to the 404 middleware.
+7. The terminal error middleware returns a safe Boom/body-parser response or masks an unexpected failure as `500`.
 
 The response adapter is for JSON-style API responses. Streaming and download endpoints must set `response.locals.skipResponseEnvelope = true` before writing.
